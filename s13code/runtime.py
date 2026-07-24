@@ -19,6 +19,7 @@ from s13code.core.memory import MemoryKind, MemoryRecord, MemoryScope, MemorySto
 from s13code.core.memory.embeddings import OllamaNomicEmbedder
 from s13code.planner import ConstrainedGraphPatchPlanner
 from s13code.tools import fetch_url, sandbox_files, sandbox_path, web_search
+from s13code.core.memory.embeddings import cosine
 
 TextLLM = Callable[[str, str], Awaitable[dict[str, Any]]]
 
@@ -320,16 +321,36 @@ class S13Runtime:
 
         async def remember_explicit(task: TaskSpec) -> dict[str, Any]:
             fact_text = task.input["text"]
-            birthday = re.search(r"(?:my\s+)?mom(?:'s)?\s+birthday\s+is\s+(\d{1,2}\s+[A-Za-z]+\s+\d{4})",
-                                 fact_text, re.I)
-            if birthday:
-                fact_text = f"Mom's birthday is {birthday.group(1)}."
+
+            # Generic contradiction/correction detection: a new fact that is
+            # semantically near-identical to an existing *current* fact in the same
+            # scope, but whose text differs, is treated as a correction rather than
+            # a separate duplicate fact. This never inspects what the fact is about,
+            # and it does not special-case any particular subject.
+            embed_fn = getattr(runtime.memory.embedder, "embed_document", runtime.memory.embedder.embed)
+            new_vector = embed_fn(fact_text)
+            candidates = runtime.memory.recall(fact_text, scope, kinds=[MemoryKind.FACT], limit=5)
+            best_score, best_match = 0.0, None
+            for candidate in candidates:
+                if candidate.text == fact_text:
+                    continue
+                score = cosine(new_vector, embed_fn(candidate.text))
+                if score > best_score:
+                    best_score, best_match = score, candidate
+
+            CONTRADICTION_THRESHOLD = 0.85
+            supersedes_id = best_match.id if best_match and best_score >= CONTRADICTION_THRESHOLD else None
+
             record = runtime.memory.write(MemoryRecord(
                 MemoryKind.FACT, scope, fact_text, [user_source],
-                Principal("gateway", "gateway"), metadata={"run_id": run_id, "promotion": "explicit_user_request"},
+                Principal("gateway", "gateway"),
+                metadata={"run_id": run_id, "promotion": "explicit_user_request",
+                        "supersedes_similarity": best_score if supersedes_id else None},
+                supersedes_id=supersedes_id,
             ))
             return {"fact": {"id": record.id, "kind": record.kind.value, "text": record.text,
-                              "sources": [source.uri for source in record.sources]}}
+                            "sources": [source.uri for source in record.sources],
+                            "supersedes_id": record.supersedes_id, "status": record.status}}
 
         async def run_search(task: TaskSpec) -> dict[str, Any]:
             return await web_search(task.input["query"], max_results=int(task.input.get("max_results", 3)))

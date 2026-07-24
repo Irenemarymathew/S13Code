@@ -1,0 +1,247 @@
+{
+    "run_id": "run-5b6034242f96",
+    "status": "completed",
+    "answer": "You told me that your mom's birthday is 16 May 2026, not 15 May [source: api://agent/runs].",
+    "provider": "gemini_1",
+    "model": "gemini-2.5-flash",
+    "graph": {
+        "finished": true,
+        "nodes": {
+            "answer": {
+                "id": "answer",
+                "skill": "answer_with_evidence",
+                "input": {
+                    "query": "When is mom birthday?"
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "answer": "You told me that your mom's birthday is 16 May 2026, not 15 May [source: api://agent/runs].",
+                    "provider": "gemini_1",
+                    "model": "gemini-2.5-flash",
+                    "evidence_count": 5
+                }
+            },
+            "recall": {
+                "id": "recall",
+                "skill": "memory_recall",
+                "input": {
+                    "query": "When is mom birthday?"
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "hits": [
+                        {
+                            "id": "mem_c675e312a41248549c0dfbe109e8612d",
+                            "kind": "fact",
+                            "text": "Actually, my mom's birthday is 16 May 2026, not 15 May. Remember that.",
+                            "sources": [
+                                "api://agent/runs"
+                            ]
+                        },
+                        {
+                            "id": "mem_0272dccad6e246b089ac11784aaa1fad",
+                            "kind": "episode",
+                            "text": "Actually, my mom's birthday is 16 May 2026, not 15 May. Remember that.",
+                            "sources": [
+                                "api://agent/runs"
+                            ]
+                        },
+                        {
+                            "id": "mem_a17b18a84c8640ebae86b268dd35b5aa",
+                            "kind": "episode",
+                            "text": "My mom's birthday is 15 May 2026. Remember that.",
+                            "sources": [
+                                "api://agent/runs"
+                            ]
+                        },
+                        {
+                            "id": "mem_a79dae42e65b49c1a379e98ddf5618c4",
+                            "kind": "episode",
+                            "text": "You told me that your mom's birthday is 16 May 2026, not 15 May [source: api://agent/runs].",
+                            "sources": [
+                                "run://run-5830870b430a/answer"
+                            ]
+                        },
+                        {
+                            "id": "mem_eaaadcdeaa32443eb30fdd577d7ee755",
+                            "kind": "episode",
+                            "text": "You told me that your mom's birthday is 15 May 2026 [source: api://agent/runs].",
+                            "sources": [
+                                "run://run-d2eb5dcd0734/answer"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "edges": [
+            [
+                "recall",
+                "answer"
+            ]
+        ]
+    },
+    "trace": {
+        "planner": {
+            "mode": "deterministic"
+        },
+        "agents": {
+            "answer": {
+                "agent": "answer_with_evidence",
+                "skill": "answer_with_evidence",
+                "state": "succeeded",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash"
+            },
+            "recall": {
+                "agent": "memory_recall",
+                "skill": "memory_recall",
+                "state": "succeeded",
+                "provider": null,
+                "model": null
+            }
+        }
+    },
+    "events": [
+        {
+            "sequence": 469,
+            "kind": "run_started",
+            "node_id": null,
+            "payload": {}
+        },
+        {
+            "sequence": 470,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 469,
+                "reason": "first frontier selected for memory",
+                "add": [
+                    "recall"
+                ],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 471,
+            "kind": "task_started",
+            "node_id": "recall",
+            "payload": {
+                "skill": "memory_recall",
+                "agent": "memory_recall"
+            }
+        },
+        {
+            "sequence": 472,
+            "kind": "task_succeeded",
+            "node_id": "recall",
+            "payload": {
+                "hits": [
+                    {
+                        "id": "mem_c675e312a41248549c0dfbe109e8612d",
+                        "kind": "fact",
+                        "text": "Actually, my mom's birthday is 16 May 2026, not 15 May. Remember that.",
+                        "sources": [
+                            "api://agent/runs"
+                        ]
+                    },
+                    {
+                        "id": "mem_0272dccad6e246b089ac11784aaa1fad",
+                        "kind": "episode",
+                        "text": "Actually, my mom's birthday is 16 May 2026, not 15 May. Remember that.",
+                        "sources": [
+                            "api://agent/runs"
+                        ]
+                    },
+                    {
+                        "id": "mem_a17b18a84c8640ebae86b268dd35b5aa",
+                        "kind": "episode",
+                        "text": "My mom's birthday is 15 May 2026. Remember that.",
+                        "sources": [
+                            "api://agent/runs"
+                        ]
+                    },
+                    {
+                        "id": "mem_a79dae42e65b49c1a379e98ddf5618c4",
+                        "kind": "episode",
+                        "text": "You told me that your mom's birthday is 16 May 2026, not 15 May [source: api://agent/runs].",
+                        "sources": [
+                            "run://run-5830870b430a/answer"
+                        ]
+                    },
+                    {
+                        "id": "mem_eaaadcdeaa32443eb30fdd577d7ee755",
+                        "kind": "episode",
+                        "text": "You told me that your mom's birthday is 15 May 2026 [source: api://agent/runs].",
+                        "sources": [
+                            "run://run-d2eb5dcd0734/answer"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "sequence": 473,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 472,
+                "reason": "authorized retrieval completed",
+                "add": [
+                    "answer"
+                ],
+                "connect": [
+                    [
+                        "recall",
+                        "answer"
+                    ]
+                ],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 474,
+            "kind": "task_started",
+            "node_id": "answer",
+            "payload": {
+                "skill": "answer_with_evidence",
+                "agent": "answer_with_evidence"
+            }
+        },
+        {
+            "sequence": 475,
+            "kind": "task_succeeded",
+            "node_id": "answer",
+            "payload": {
+                "answer": "You told me that your mom's birthday is 16 May 2026, not 15 May [source: api://agent/runs].",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash",
+                "evidence_count": 5
+            }
+        },
+        {
+            "sequence": 476,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 475,
+                "reason": "grounded answer produced",
+                "add": [],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": true
+            }
+        }
+    ]
+}

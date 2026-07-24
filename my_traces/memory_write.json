@@ -1,0 +1,235 @@
+{
+    "run_id": "run-d2eb5dcd0734",
+    "status": "completed",
+    "answer": "You told me that your mom's birthday is 15 May 2026 [source: api://agent/runs].",
+    "provider": "gemini_1",
+    "model": "gemini-2.5-flash",
+    "graph": {
+        "finished": true,
+        "nodes": {
+            "answer": {
+                "id": "answer",
+                "skill": "answer_with_evidence",
+                "input": {
+                    "query": "My mom's birthday is 15 May 2026. Remember that."
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "answer": "You told me that your mom's birthday is 15 May 2026 [source: api://agent/runs].",
+                    "provider": "gemini_1",
+                    "model": "gemini-2.5-flash",
+                    "evidence_count": 1
+                }
+            },
+            "recall": {
+                "id": "recall",
+                "skill": "memory_recall",
+                "input": {
+                    "query": "My mom's birthday is 15 May 2026. Remember that."
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "hits": []
+                }
+            },
+            "remember": {
+                "id": "remember",
+                "skill": "remember_explicit_fact",
+                "input": {
+                    "text": "My mom's birthday is 15 May 2026. Remember that."
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "fact": {
+                        "id": "mem_b353e4e2d7ca4cb496cdd2397082ebe2",
+                        "kind": "fact",
+                        "text": "My mom's birthday is 15 May 2026. Remember that.",
+                        "sources": [
+                            "api://agent/runs"
+                        ],
+                        "supersedes_id": null,
+                        "status": "current"
+                    }
+                }
+            }
+        },
+        "edges": [
+            [
+                "recall",
+                "answer"
+            ]
+        ]
+    },
+    "trace": {
+        "planner": {
+            "mode": "deterministic"
+        },
+        "agents": {
+            "answer": {
+                "agent": "answer_with_evidence",
+                "skill": "answer_with_evidence",
+                "state": "succeeded",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash"
+            },
+            "recall": {
+                "agent": "memory_recall",
+                "skill": "memory_recall",
+                "state": "succeeded",
+                "provider": null,
+                "model": null
+            },
+            "remember": {
+                "agent": "remember_explicit_fact",
+                "skill": "remember_explicit_fact",
+                "state": "succeeded",
+                "provider": null,
+                "model": null
+            }
+        }
+    },
+    "events": [
+        {
+            "sequence": 447,
+            "kind": "run_started",
+            "node_id": null,
+            "payload": {}
+        },
+        {
+            "sequence": 448,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 447,
+                "reason": "first frontier selected for memory",
+                "add": [
+                    "recall",
+                    "remember"
+                ],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 449,
+            "kind": "task_started",
+            "node_id": "recall",
+            "payload": {
+                "skill": "memory_recall",
+                "agent": "memory_recall"
+            }
+        },
+        {
+            "sequence": 450,
+            "kind": "task_started",
+            "node_id": "remember",
+            "payload": {
+                "skill": "remember_explicit_fact",
+                "agent": "remember_explicit_fact"
+            }
+        },
+        {
+            "sequence": 451,
+            "kind": "task_succeeded",
+            "node_id": "recall",
+            "payload": {
+                "hits": []
+            }
+        },
+        {
+            "sequence": 452,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 451,
+                "reason": "authorized retrieval completed",
+                "add": [
+                    "answer"
+                ],
+                "connect": [
+                    [
+                        "recall",
+                        "answer"
+                    ]
+                ],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 453,
+            "kind": "task_succeeded",
+            "node_id": "remember",
+            "payload": {
+                "fact": {
+                    "id": "mem_b353e4e2d7ca4cb496cdd2397082ebe2",
+                    "kind": "fact",
+                    "text": "My mom's birthday is 15 May 2026. Remember that.",
+                    "sources": [
+                        "api://agent/runs"
+                    ],
+                    "supersedes_id": null,
+                    "status": "current"
+                }
+            }
+        },
+        {
+            "sequence": 454,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 453,
+                "reason": "",
+                "add": [],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 455,
+            "kind": "task_started",
+            "node_id": "answer",
+            "payload": {
+                "skill": "answer_with_evidence",
+                "agent": "answer_with_evidence"
+            }
+        },
+        {
+            "sequence": 456,
+            "kind": "task_succeeded",
+            "node_id": "answer",
+            "payload": {
+                "answer": "You told me that your mom's birthday is 15 May 2026 [source: api://agent/runs].",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash",
+                "evidence_count": 1
+            }
+        },
+        {
+            "sequence": 457,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 456,
+                "reason": "grounded answer produced",
+                "add": [],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": true
+            }
+        }
+    ]
+}

@@ -1,0 +1,165 @@
+{
+    "run_id": "run-1da9cba51910",
+    "status": "completed",
+    "answer": "I do not have access to your mom's birthday information.",
+    "provider": "gemini_1",
+    "model": "gemini-2.5-flash",
+    "graph": {
+        "finished": true,
+        "nodes": {
+            "answer": {
+                "id": "answer",
+                "skill": "answer_with_evidence",
+                "input": {
+                    "query": "When is mom birthday?"
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "answer": "I do not have access to your mom's birthday information.",
+                    "provider": "gemini_1",
+                    "model": "gemini-2.5-flash",
+                    "evidence_count": 0
+                }
+            },
+            "recall": {
+                "id": "recall",
+                "skill": "memory_recall",
+                "input": {
+                    "query": "When is mom birthday?"
+                },
+                "metadata": {},
+                "state": "succeeded",
+                "result": {
+                    "hits": []
+                }
+            }
+        },
+        "edges": [
+            [
+                "recall",
+                "answer"
+            ]
+        ]
+    },
+    "trace": {
+        "planner": {
+            "mode": "deterministic"
+        },
+        "agents": {
+            "answer": {
+                "agent": "answer_with_evidence",
+                "skill": "answer_with_evidence",
+                "state": "succeeded",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash"
+            },
+            "recall": {
+                "agent": "memory_recall",
+                "skill": "memory_recall",
+                "state": "succeeded",
+                "provider": null,
+                "model": null
+            }
+        }
+    },
+    "events": [
+        {
+            "sequence": 477,
+            "kind": "run_started",
+            "node_id": null,
+            "payload": {}
+        },
+        {
+            "sequence": 478,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 477,
+                "reason": "first frontier selected for memory",
+                "add": [
+                    "recall"
+                ],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 479,
+            "kind": "task_started",
+            "node_id": "recall",
+            "payload": {
+                "skill": "memory_recall",
+                "agent": "memory_recall"
+            }
+        },
+        {
+            "sequence": 480,
+            "kind": "task_succeeded",
+            "node_id": "recall",
+            "payload": {
+                "hits": []
+            }
+        },
+        {
+            "sequence": 481,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 480,
+                "reason": "authorized retrieval completed",
+                "add": [
+                    "answer"
+                ],
+                "connect": [
+                    [
+                        "recall",
+                        "answer"
+                    ]
+                ],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": false
+            }
+        },
+        {
+            "sequence": 482,
+            "kind": "task_started",
+            "node_id": "answer",
+            "payload": {
+                "skill": "answer_with_evidence",
+                "agent": "answer_with_evidence"
+            }
+        },
+        {
+            "sequence": 483,
+            "kind": "task_succeeded",
+            "node_id": "answer",
+            "payload": {
+                "answer": "I do not have access to your mom's birthday information.",
+                "provider": "gemini_1",
+                "model": "gemini-2.5-flash",
+                "evidence_count": 0
+            }
+        },
+        {
+            "sequence": 484,
+            "kind": "graph_patched",
+            "node_id": null,
+            "payload": {
+                "trigger_event": 483,
+                "reason": "grounded answer produced",
+                "add": [],
+                "connect": [],
+                "cancel": [],
+                "wait": [],
+                "resume": [],
+                "finish": true
+            }
+        }
+    ]
+}

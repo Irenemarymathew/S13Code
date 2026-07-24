@@ -258,6 +258,20 @@ the earlier conversational turn, which is expected: episodes are a distinct
 memory type that preserves full conversational history independently of
 fact corrections.
 
+### 4b. Denied cross-scope recall
+
+The same question asked from a *different* tenant (`different-tenant` instead
+of `course`) returns no hits and an honest "I don't have that information"
+answer, rather than leaking the `course` tenant's fact:
+
+```bash
+curl -s http://127.0.0.1:8113/v1/agent/runs -H "Content-Type: application/json" -d "{\"tenant_id\": \"different-tenant\", \"project_id\": \"contradiction-test\", \"user_id\": \"student-01\", \"prompt\": \"When is mom birthday?\"}"
+```
+
+Result: `recall` returned `"hits": []`, `evidence_count: 0`, and the answer
+was *"I do not have access to your mom's birthday information."* Full trace
+in `my_traces/cross_tenant_denied.json`.
+
 ### 5. Evidence and provider/agent assignments
 
 - `recall` / `remember`: local, no provider (pure store operations)
@@ -269,25 +283,37 @@ fact corrections.
 
 **Attack**: an attacker who has learned another tenant's memory record id
 (e.g. via a leaked log line or an unrelated bug) attempts to use the new
-supersede path to overwrite that tenant's fact from a *different* tenant
-scope.
+supersede path to overwrite/erase that tenant's fact from a *different*
+tenant scope.
 
-**Before any project-specific fix was needed**: the underlying
-`MemoryStore.write()` already validates `old.scope == record.scope` before
-honouring a `supersedes_id` (this check pre-dates this extension). Our new
-`remember_explicit` code **calls into this same validated path** rather than
-bypassing it, so the attack is blocked by construction, not by a bolted-on
-check.
+**Before**: `adversarial_test.py` first simulates what this attack would
+achieve *without* scope validation, by writing directly to the underlying
+SQLite table (bypassing `store.write()` entirely, as an attacker could if a
+future code path skipped validation). This succeeds: the victim's fact
+silently flips from `current` to `superseded`, demonstrating the
+vulnerability is real and consequential, not hypothetical.
+
+**After**: the same conceptual attack is then run through the actual,
+guarded code path -- `store.write()`, the same function `remember_explicit`
+calls in production. `MemoryStore.write()` validates `old.scope ==
+record.scope` before honouring any `supersedes_id` (this check pre-dates
+this extension). Because our new code calls into this same validated path
+rather than bypassing it, the real attack is rejected and the victim's fact
+is confirmed unchanged.
 
 **Reproduction** (`adversarial_test.py`, run from a fresh checkout):
 ```bash
 uv run python adversarial_test.py
 ```
 Output:
-
-Victim fact written: mem_69872811ae9b4cb19e614d3f3d23c498 (tenant-a, status=current)
+```
+Victim fact written: mem_6b9710392ed14318bdfa2d3e97638444 (tenant-a, status=current)
+--- Simulating attack WITHOUT the scope guard (raw DB write) ---
+FAIL (expected, this is the vulnerability): victim fact status is now 'superseded' -- an attacker who could write directly to storage, or call a hypothetical unguarded API, could silently erase another tenant's fact.
+--- Running the real attack through store.write() (the actual, guarded code path used by remember_explicit) ---
 PASS: cross-tenant supersession correctly rejected: a record may supersede only the same kind in the same scope
 Victim fact confirmed unchanged: status=current
+```
 
 ### 7. Commands that reproduce everything from a fresh checkout
 
